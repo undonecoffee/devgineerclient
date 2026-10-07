@@ -3,6 +3,8 @@ package com.devgineerclient
 import com.devgineerclient.bossrecorder.BossRecorder
 import com.devgineerclient.maxor.MaxorCrystals
 import com.devgineerclient.recorder.DungeonRecorder
+import com.devgineerclient.splits.DungeonSplits
+import com.devgineerclient.splits.PaceTargets
 import com.odtheking.odin.config.ModuleConfig
 import com.odtheking.odin.features.ModuleManager
 import net.fabricmc.api.ClientModInitializer
@@ -18,7 +20,8 @@ object DevgineerClient : ClientModInitializer {
 
     override fun onInitializeClient() {
         // Odin's addon path: own ClickGUI panel, own config file (config/odin/addons/devgineerclient.json).
-        ModuleManager.registerModules(ModuleConfig("devgineerclient.json"), DungeonRecorder, BossRecorder, MaxorCrystals)
+        ModuleManager.registerModules(ModuleConfig("devgineerclient.json"), DungeonRecorder, BossRecorder, MaxorCrystals, DungeonSplits)
+        safely("pace targets") { PaceTargets.install() }
 
         // On by default, existing installs included (once: turning it off sticks).
         safely("boss recorder default") { BossRecorder.enableByDefault() }
