@@ -54,6 +54,7 @@ import org.lwjgl.glfw.GLFW
  */
 object DungeonRecorder : Module(
     name = "Dungeon Recorder",
+    key = null,
     category = Category.custom("Devgineer Client"),
     description = "Records everything in a dungeon, losslessly - every packet both ways, the world, every entity, your input and state, screens and HUD, Odin's state - as context for building mods. Saved to devgineerclient-recordings/ in the game folder.",
 ) {

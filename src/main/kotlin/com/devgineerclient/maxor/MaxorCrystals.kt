@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 object MaxorCrystals : Module(
     name = "Maxor Crystals",
+    key = null,
     category = Category.custom("Devgineer Client"),
     description = "F7 P1: how many server ticks each energy crystal took to place, cycle by cycle, and which laser check that made.",
 ) {
