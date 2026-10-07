@@ -4,7 +4,7 @@
   "version": "${version}",
   "name": "Devgineer Client",
   "description": "Odin addon: dungeon and boss recorders, Maxor crystal timings.",
-  "authors": ["engineerandrew"],
+  "authors": ["EngineerAndrewPerm INC."],
   "license": "All-Rights-Reserved",
   "environment": "client",
   "mixins": ["devgineerclient.mixins.json"],
