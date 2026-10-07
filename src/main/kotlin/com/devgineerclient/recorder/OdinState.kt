@@ -2,6 +2,7 @@ package com.devgineerclient.recorder
 
 import com.devgineerclient.DevgineerClient
 import com.odtheking.odin.clickgui.settings.Setting
+import com.odtheking.odin.clickgui.settings.RenderableSetting
 import com.odtheking.odin.clickgui.settings.impl.StringSetting
 import com.odtheking.odin.events.LevelEvent
 import com.odtheking.odin.events.MessageEvent
@@ -11,7 +12,6 @@ import com.odtheking.odin.events.core.on
 import com.odtheking.odin.events.core.onReceive
 import com.odtheking.odin.features.ModuleManager
 import com.odtheking.odin.features.impl.dungeon.LeapMenu
-import com.odtheking.odin.features.impl.dungeon.MapInfo
 import com.odtheking.odin.features.impl.dungeon.map.DungeonScan
 import com.odtheking.odin.features.impl.dungeon.map.WorldScan
 import com.odtheking.odin.features.impl.dungeon.map.tile.DungeonDoor
@@ -160,7 +160,8 @@ object OdinState {
         j.safe("inBoss") { it.append(DungeonListener.inBoss) }
         j.safe("inClear") { it.append(DungeonUtils.inClear) }
         j.safe("paul") { it.append(DungeonListener.paul) }
-        j.safe("togglePaul") { it.append(MapInfo.togglePaul) }
+        // Odin 0.3.6 dropped its Paul override setting (it goes by the mayor alone): kept as null.
+        j.safe("togglePaul") { it.append("null") }
         j.safe("f7Phase") { OdinJs.str(it, DungeonUtils.getF7Phase().name) }
         // Replaced (not mutated) by Odin on every update: read it once, fresh.
         j.safe("stats") { out ->
@@ -169,7 +170,7 @@ object OdinState {
             o.n("secretsFound", st.secretsFound).n("secretsPercent", st.secretsPercent).n("knownSecrets", st.knownSecrets)
                 .n("crypts", st.crypts).n("openedRooms", st.openedRooms).n("completedRooms", st.completedRooms)
                 .n("deaths", st.deaths).n("percentCleared", st.percentCleared).s("elapsed", st.elapsedTime)
-                .b("mimic", st.mimicKilled).b("prince", st.princeKilled).b("bat", st.batKilled)
+                .b("mimic", st.mimicKilled).b("prince", st.princeKilled).b("bat", st.batKilled > 0).n("batKills", st.batKilled)
                 .s("doorOpener", st.doorOpener).b("bloodDone", st.bloodDone).n("puzzleCount", st.puzzleCount)
             out.append('{').append(o.sb).append('}')
         }
@@ -458,13 +459,12 @@ object OdinState {
     }
 
     private val gson = com.google.gson.Gson()
-    private val hiddenGetter by lazy { runCatching { Setting::class.java.getDeclaredMethod("getHidden").apply { isAccessible = true } }.getOrNull() }
 
     // Odin's Saving interface (a setting's saved form) is Kotlin-internal: public in bytecode, reached by reflection.
     private val saving: Class<*>? by lazy { runCatching { Class.forName("com.odtheking.odin.clickgui.settings.Saving") }.getOrNull() }
     private val savingWrite by lazy { runCatching { saving?.getMethod("write", com.google.gson.Gson::class.java) }.getOrNull() }
 
-    private fun hidden(s: Setting<*>): Boolean = runCatching { hiddenGetter?.invoke(s) as? Boolean }.getOrNull() ?: false
+    private fun hidden(s: Setting<*>): Boolean = (s as? RenderableSetting<*>)?.hidden ?: false
 
     /**
      * Every module (Odin's and ours, which register through Odin), on or off, with every setting's

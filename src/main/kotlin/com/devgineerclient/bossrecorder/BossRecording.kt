@@ -114,7 +114,7 @@ class BossRecording(private val dir: Path) {
         val player = DevgineerClient.mc.player
         val version = net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("devgineerclient")
             .map { it.metadata.version.friendlyString }.orElse("?")
-        emit("""{"k":"meta","format":"bosses-1","mod":${js(version)},"mc":"26.1.2","self":${js(player?.name?.string ?: "?")},"selfId":${player?.id ?: -1},"startMs":${System.currentTimeMillis()},"t":$tick,"n":$serverTicks}""")
+        emit("""{"k":"meta","format":"bosses-1","mod":${js(version)},"mc":"26.2","self":${js(player?.name?.string ?: "?")},"selfId":${player?.id ?: -1},"startMs":${System.currentTimeMillis()},"t":$tick,"n":$serverTicks}""")
         if (BossRecorder.startMessage) DevgineerClient.msg("§7Boss Recorder: recording")
     }
 

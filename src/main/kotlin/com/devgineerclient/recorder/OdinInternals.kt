@@ -164,7 +164,8 @@ object OdinInternals {
         // ---- P3 device helpers
         Probe("odin.p3", "ArrowAlign", BOSS + "ArrowAlign", fields(BOSS + "ArrowAlign", "recentClickTimestamps", "clicksRemaining", "currentFrameRotations", "targetSolution")),
         Probe("odin.p3", "ArrowsDevice", BOSS + "ArrowsDevice", fields(BOSS + "ArrowsDevice", "markedPositions", "targetPosition", "isDeviceComplete", "optimalAimPositions")),
-        Probe("odin.p3", "InactiveWaypoints", BOSS + "InactiveWaypoints", fields(BOSS + "InactiveWaypoints", "inactiveList", "section", "terminals", "levers", "device",
+        // Odin 0.3.6 moved this state into TerminalsStatus (without inactiveList); still written as "InactiveWaypoints".
+        Probe("odin.p3", "InactiveWaypoints", BOSS + "TerminalsStatus", fields(BOSS + "TerminalsStatus", "inactiveList", "section", "terminals", "levers", "device",
             "gate", "isComplete", "firstInSection", "lastCompleted")),
         Probe("odin.p3", "SimonSays", BOSS + "SimonSays", fields(BOSS + "SimonSays", "clickInOrder", "clickNeeded", "firstPhase", "startClickCounter", "lastLanternTick")),
         Probe("odin.p3", "BreakerDisplay", DUNGEON + "BreakerDisplay", fields(DUNGEON + "BreakerDisplay", "charges", "maxCharges")),

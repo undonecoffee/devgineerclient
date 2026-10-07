@@ -115,14 +115,14 @@ object ThumbCapture {
         if (due) whys += "fps"
         lastNs = now
         // Typed Chat off: a picture of a text field being typed into would show what is redacted everywhere else.
-        if (InputCapture.redactKeys(DevgineerClient.mc.screen)) { skippedTyping.incrementAndGet(); return }
+        if (InputCapture.redactKeys(DevgineerClient.mc.gui.screen())) { skippedTyping.incrementAndGet(); return }
 
         val session = Rec.session ?: return
-        val target = DevgineerClient.mc.mainRenderTarget
+        val target = DevgineerClient.mc.gameRenderer.mainRenderTarget()
         val fw = target.width
         val fh = target.height
         val tex = target.colorTexture ?: return
-        if (fw <= 0 || fh <= 0 || tex.format.pixelSize() != 4) return
+        if (fw <= 0 || fh <= 0 || tex.format.blockSize() != 4) return
         val (ow, oh) = ThumbMath.outSize(fw, fh)
         val seq = Rec.nextSeq()
         val env = Rec.envelope("thumb", seq)
@@ -135,9 +135,8 @@ object ThumbCapture {
             // What Screenshot.takeScreenshot does, without its per-pixel loop on the render thread.
             val device = RenderSystem.getDevice()
             val buf = device.createBuffer({ "Recorder thumbnail" }, GpuBuffer.USAGE_MAP_READ or GpuBuffer.USAGE_COPY_DST, fw.toLong() * fh * 4)
-            val enc = device.createCommandEncoder()
             try {
-                device.createCommandEncoder().copyTextureToBuffer(tex, buf, 0L, Runnable { delivered(enc, buf, session, seq, env, ms, rel, why, fw, fh, ow, oh) }, 0)
+                device.createCommandEncoder().copyTextureToBuffer(tex, buf, 0L, Runnable { delivered(buf, session, seq, env, ms, rel, why, fw, fh, ow, oh) }, 0)
             } catch (t: Throwable) {
                 runCatching { buf.close() }
                 throw t
@@ -152,13 +151,13 @@ object ThumbCapture {
      * The GPU copy is back (render thread): one bulk copy of the pixels (ABGR, bottom row first) out
      * of the buffer, the buffer closed, the line written; everything per-pixel is the encoder's.
      */
-    private fun delivered(enc: com.mojang.blaze3d.systems.CommandEncoder, buf: GpuBuffer, session: RecorderSession, seq: Long, env: String, ms: Long,
+    private fun delivered(buf: GpuBuffer, session: RecorderSession, seq: Long, env: String, ms: Long,
                           rel: String, why: String, fw: Int, fh: Int, ow: Int, oh: Int) {
         inFlight.updateAndGet { if (it > 0) it - 1 else 0 }
         var abgr: IntArray? = null
         try {
             if (Rec.session === session && session.running) {
-                enc.mapBuffer(buf, true, false).use { view -> abgr = IntArray(fw * fh).also { view.data().asIntBuffer().get(it) } }
+                buf.map(true, false).use { view -> abgr = IntArray(fw * fh).also { view.data().asIntBuffer().get(it) } }
             }
         } catch (t: Throwable) {
             DevgineerClient.logger.error("[dc] recorder thumb read failed", t)
