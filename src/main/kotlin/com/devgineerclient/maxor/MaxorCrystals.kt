@@ -34,7 +34,9 @@ import java.util.concurrent.ConcurrentLinkedQueue
  * placed it (the picker nearest the pylon - a guess), which 10-tick check the laser was charged
  * for and which it fired on, and how early both crystals had to be in to make the earliest check
  * the cycle could make (the beacon, or the previous hit + 70). The rules are in
- * docs/mechanics/maxor-alpha.md; the bookkeeping is [CrystalCycles].
+ * docs/mechanics/maxor-alpha.md, which the main server matches since Hypixel's 2026-10-06 boss update
+ * (102 runs: pylons open s0 + 79-83, beacon 118-122, kill to Storm 61-64); the bookkeeping is
+ * [CrystalCycles].
  *
  * Everything is read off the network ahead of every other mod (ConnectionTapMixin), and timed by
  * its own count of the server's top-level pings - as Odin counts server ticks.
@@ -195,9 +197,9 @@ object MaxorCrystals : Module(
         fun check(v: Int) = if (firstCycle) (if (v == 0) "the beacon" else "beacon+$v") else "+$v"
         val ready = r.readyFor?.let { "§7 → ready for §f${check(it)}" } ?: ""
         val hit = r.hitAt?.let { " §7· hit §f${check(it)}" } ?: if (r.readyFor != null) " §7· §cno hit" else ""
-        // The +70 hint is for the alpha fight; on the main server the 10 s laser cooldown sets the second hit.
-        val cooldownBound = !firstCycle && (r.hitAt ?: 0) > 100
-        val target = r.best?.takeIf { !cooldownBound }?.let { b -> " §8(" + (if (firstCycle) "the beacon" else "+70") + ": both by +$b)" } ?: ""
+        // Since Hypixel's 2026-10-06 boss update the main server runs the alpha fight: no 10 s laser
+        // cooldown (102 runs: hit 1 to hit 2 at 79 at the earliest, was 200), so +70 is always the target.
+        val target = r.best?.let { b -> " §8(" + (if (firstCycle) "the beacon" else "+70") + ": both by +$b)" } ?: ""
         val line = "§dCrystals ${r.cycle} §8$from§7: $coloured$missing$picks$ready$hit$target"
         if (chatReport) DevgineerClient.msg(line)
         val plain = line.replace(CONTROL_CODES, "")

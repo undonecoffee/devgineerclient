@@ -1,7 +1,8 @@
 package com.devgineerclient.maxor
 
 /**
- * Maxor's energy-crystal cycles, timed from what a client can see (docs/mechanics/maxor-alpha.md).
+ * Maxor's energy-crystal cycles, timed from what a client can see (docs/mechanics/maxor-alpha.md;
+ * the main server has run the same fight since Hypixel's 2026-10-06 boss update).
  *
  *  - Maxor's phase runs on a 10-tick check. The pylons open on the check 40 ticks before the
  *    beacon goes in; the beacon slot (73, 221-222, 73) is cleared one tick after that check.
