@@ -1,11 +1,15 @@
 name: Release
 
+# One rolling release: every push to main replaces the "main" release.
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
 
 jobs:
   release:
@@ -19,7 +23,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: 9.6.1
+      - name: Version
+        run: echo "EC_VERSION=$(date -u +%Y.%-m.%-d)+${GITHUB_SHA::7}" >> "$GITHUB_ENV"
       - run: gradle build --console=plain -Dorg.gradle.jvmargs=-Xmx2G
-      - run: gh release create "$GITHUB_REF_NAME" build/libs/*.jar --title "$GITHUB_REF_NAME" --notes ""
+      - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete release-main --yes --cleanup-tag || true
+          gh release create release-main build/libs/*.jar --target "$GITHUB_SHA" --title main --notes "$EC_VERSION" --latest

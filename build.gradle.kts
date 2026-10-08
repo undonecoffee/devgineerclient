@@ -6,8 +6,8 @@ plugins {
 }
 
 group = "com.devgineerclient"
-// Release tags (v0.6.66) set the version.
-version = providers.environmentVariable("GITHUB_REF_NAME").map { it.removePrefix("v") }.getOrElse("dev")
+// The release workflow sets EC_VERSION (2026.10.8+abc1234); local builds use GITHUB_REF_NAME.
+version = providers.environmentVariable("EC_VERSION").orElse(providers.environmentVariable("GITHUB_REF_NAME").map { it.removePrefix("v") }).getOrElse("dev")
 
 base {
     archivesName.set("devgineerclient")
