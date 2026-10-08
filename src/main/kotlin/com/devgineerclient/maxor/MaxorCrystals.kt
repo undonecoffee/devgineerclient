@@ -114,7 +114,8 @@ object MaxorCrystals : Module(
             is ClientboundLoginPacket, is ClientboundRespawnPacket -> { model?.end(null); model = null; withers.clear(); health.clear() }
             is ClientboundSystemChatPacket -> if (!p.overlay) chat(p.content.string.replace(CONTROL_CODES, ""))
             is ClientboundAddEntityPacket -> {
-                if (p.type == EntityTypes.WITHER) withers += p.id
+                // Not a Witherborn wither (full Storm armor): it is never Maxor.
+                if (p.type == EntityTypes.WITHER && !com.devgineerclient.splits.Witherborn.onSpawn(p.id, p.x, p.y, p.z)) withers += p.id
                 val m = model ?: return
                 if (p.type != EntityTypes.END_CRYSTAL) return
                 if (p.y > 231) { m.crystalsBack(ticks); return }
