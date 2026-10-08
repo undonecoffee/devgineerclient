@@ -246,7 +246,7 @@ object OdinInternals {
             parts += Part(m.name, json, m.ticking)
         }
         val (body, key) = compose(p.mod, parts)
-        if (Rec.changed("u12:${p.kind}:${p.mod}", key)) Rec.emit(p.kind, body)
+        if (Rec.changed("odin.priv:${p.kind}:${p.mod}", key)) Rec.emit(p.kind, body)
     }
 
     /** A field this Odin does not have: said once per recording, then left out. */
@@ -259,7 +259,7 @@ object OdinInternals {
         val rows = try { SplitsManager.currentRows().toList() } catch (t: Throwable) { missing("SplitsManager", "currentRows"); return }
         val all = rows.joinToString(",", "[", "]") { "[${RecorderFiles.q(it.name)},${it.time},${it.tickTime},${it.isCurrent}]" }
         val key = rows.joinToString(",") { if (it.isCurrent) "${it.name}|cur" else "${it.name}|${it.time}|${it.tickTime}" }
-        if (Rec.changed("u12:splits", key)) Rec.emit("odin.splits", "\"rows\":$all,\"cols\":[\"name\",\"time\",\"tickTime\",\"current\"]")
+        if (Rec.changed("odin.priv:splits", key)) Rec.emit("odin.splits", "\"rows\":$all,\"cols\":[\"name\",\"time\",\"tickTime\",\"current\"]")
     }
 
     /** Each scanned room's waypoints with their clicked state, one line per room when it changes. */
@@ -284,7 +284,7 @@ object OdinInternals {
             }
             sb.append(']')
             val body = sb.toString()
-            if (Rec.changed("u12:wp:$name:${r.topLeft}", body)) Rec.emit("room.wp", body)
+            if (Rec.changed("odin.priv:wp:$name:${r.topLeft}", body)) Rec.emit("room.wp", body)
         }
     }
 
@@ -366,7 +366,7 @@ object OdinInternals {
                 val count = bytes?.let { runCatching { com.google.gson.JsonParser.parseString(String(it, Charsets.UTF_8)).let { j -> if (j.isJsonArray) j.asJsonArray.size() else if (j.isJsonObject) j.asJsonObject.size() else null } }.getOrNull() }
                 if (Rec.session === session) Rec.emit("odin.roomdb", "\"sha1\":${RecorderFiles.q(bytes?.let { sha1(it) })},\"bytes\":${bytes?.size},\"count\":$count,\"cores\":$cores")
             }
-        }, "ec-recorder-roomdb").apply { isDaemon = true }.start()
+        }, "dc-recorder-roomdb").apply { isDaemon = true }.start()
     }
 
     /** Odin's own tick counters side by side, so its tick-based numbers can be lined up with t and n. */

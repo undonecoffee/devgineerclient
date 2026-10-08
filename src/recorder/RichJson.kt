@@ -157,9 +157,6 @@ object RichJson {
         d.blockYMask.toLongArray(), d.emptyBlockYMask.toLongArray(), d.blockUpdates.map { it.clone() },
     )
 
-    /** [writeLight] of a copy taken now (call on the thread that owns [d]). */
-    fun light(sb: StringBuilder, d: ClientboundLightUpdatePacketData, minSectionY: Int?) = writeLight(sb, copyLight(d), minSectionY)
-
     /**
      * `{"sky":{"mask":[longs],"empty":[longs],"arrays":{"<bit>":"b64"}},"block":{...},"y0"?}`. Bit i
      * of a mask is light section i, which is section y = y0 + i (the bottom light section sits one

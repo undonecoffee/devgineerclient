@@ -52,9 +52,6 @@ object EntityMirror {
     /** Queues [s] for the network thread; it only fills ids the mirror does not know yet. */
     fun seed(s: Seed) { seeds.add(s) }
 
-    /** Number of entities with a known base (diagnostics). */
-    internal val size: Int get() = codecs.size
-
     internal fun reset() {
         codecs.clear(); types.clear(); packetSpawned.clear(); seeds.clear()
     }
@@ -122,9 +119,6 @@ object EntityMirror {
         val r = p.relatives()
         return if (Relative.X in r || Relative.Y in r || Relative.Z in r) "\"absPending\":true" else abs(p.change().position())
     }
-
-    /** The current base of [id]. */
-    internal fun base(id: Int): Vec3? = codecs[id]?.base
 
     private fun drainSeeds() {
         while (true) {

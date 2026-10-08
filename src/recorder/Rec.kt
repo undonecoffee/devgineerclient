@@ -1,9 +1,6 @@
 package com.devgineerclient.recorder
 
 import com.devgineerclient.DevgineerClient
-import com.google.gson.JsonElement
-import com.mojang.serialization.DynamicOps
-import com.mojang.serialization.JsonOps
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicLong
@@ -149,10 +146,6 @@ object Rec {
     }
 
     // ------------------------------------------------------------------ shared helpers
-
-    /** Registry-aware JSON ops when connected (so registry entries encode by name), plain JSON otherwise. */
-    fun ops(): DynamicOps<JsonElement> =
-        runCatching { DevgineerClient.mc.connection?.registryAccess()?.createSerializationContext(JsonOps.INSTANCE) }.getOrNull() ?: JsonOps.INSTANCE
 
     // Hypixel's forms, then vanilla's /msg as the chat box shows it (signed chat on other servers).
     private val PRIVATE_CHAT = Regex("""^(?:(?:From|To) (?:\[[^\]]+] )?\w{1,16}: |(?:Guild|Officer|Co-op|Friend) > |\w{1,16} whispers to you: |You whisper to \w{1,16}: )""")

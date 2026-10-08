@@ -29,7 +29,7 @@ class BossRecording(private val dir: Path) {
 
     private var tick = 0
     private var open = false
-    private val io = Executors.newSingleThreadExecutor { Thread(it, "ec-bossrecorder-writer").apply { isDaemon = true } }
+    private val io = Executors.newSingleThreadExecutor { Thread(it, "dc-bossrecorder-writer").apply { isDaemon = true } }
     private var writer: BufferedWriter? = null
     private var tempFile: Path? = null
     private var linesWritten = 0L

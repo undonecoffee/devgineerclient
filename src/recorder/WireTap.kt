@@ -349,7 +349,7 @@ object WireTap {
         taken.dropped?.let { d -> Rec.emit("gap", d.json()) }
     }
 
-    /** Every serverbound packet that carries text the player typed (unit-tested against every String-holding packet). */
+    /** Every serverbound packet that carries text the player typed. */
     val TYPED_TEXT_PACKETS: Set<Class<*>> = setOf(
         ServerboundChatPacket::class.java, ServerboundChatCommandPacket::class.java, ServerboundChatCommandSignedPacket::class.java,
         ServerboundCommandSuggestionPacket::class.java, ServerboundSignUpdatePacket::class.java, ServerboundRenameItemPacket::class.java,

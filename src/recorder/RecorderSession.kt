@@ -31,9 +31,9 @@ import java.util.concurrent.locks.LockSupport
 import java.util.zip.GZIPOutputStream
 
 /**
- * One recording on disk. Lines are queued from any thread; one writer thread (`ec-recorder-writer`)
+ * One recording on disk. Lines are queued from any thread; one writer thread (`dc-recorder-writer`)
  * builds them (packets turn into JSON there, not on the network or game thread) and gzips them,
- * and one IO thread (`ec-recorder-io`) puts the bytes on disk, so a slow disk never stalls the
+ * and one IO thread (`dc-recorder-io`) puts the bytes on disk, so a slow disk never stalls the
  * serializer and a heavy packet never stalls the disk.
  *
  * Nothing is thrown away to keep the files small. The queue is bounded only by an estimate of the
@@ -201,7 +201,7 @@ class RecorderSession(
         queue.offer(Wake)
         if (closing.compareAndSet(false, true)) Thread({
             try { writer.join(); ioThread.join() } catch (_: InterruptedException) {}
-        }, "ec-recorder-close").apply { isDaemon = false; start() }
+        }, "dc-recorder-close").apply { isDaemon = false; start() }
     }
     private val closing = AtomicBoolean()
 
@@ -257,7 +257,7 @@ class RecorderSession(
     private var partSeqMin = Long.MAX_VALUE; private var partSeqMax = Long.MIN_VALUE
     private var partLines = 0L; private var partGz = 0L; private var partRawGz = 0L
 
-    private val writer = Thread(::writerLoop, "ec-recorder-writer").apply { priority = Thread.NORM_PRIORITY - 1; isDaemon = false }
+    private val writer = Thread(::writerLoop, "dc-recorder-writer").apply { priority = Thread.NORM_PRIORITY - 1; isDaemon = false }
 
     // ------------------------------------------------------------------ IO thread state
 
@@ -292,7 +292,7 @@ class RecorderSession(
     private var lastGuardMs = 0L
     private var lastSchema = -1
 
-    private val ioThread = Thread(::ioLoop, "ec-recorder-io").apply { priority = Thread.NORM_PRIORITY - 1; isDaemon = false }
+    private val ioThread = Thread(::ioLoop, "dc-recorder-io").apply { priority = Thread.NORM_PRIORITY - 1; isDaemon = false }
 
     init {
         installHooks()
@@ -914,7 +914,7 @@ class RecorderSession(
             if (!hooked.compareAndSet(false, true)) return
             // Minecraft.destroy() ends in System.exit, which runs this: the last member and the
             // part renames still happen when the game is closed with a recording open.
-            runCatching { Runtime.getRuntime().addShutdownHook(Thread({ shutdownAll(2500) }, "ec-recorder-shutdown")) }
+            runCatching { Runtime.getRuntime().addShutdownHook(Thread({ shutdownAll(2500) }, "dc-recorder-shutdown")) }
         }
 
         /** Finishes every open or closing session within [ms] in total. Bounded and idempotent. */

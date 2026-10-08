@@ -355,9 +355,6 @@ class ParticleBuffer(private val optsJson: (Any) -> String) {
         return s
     }
 
-    /** [take] and its JSON at once (tests). */
-    fun drain(): String? = take()?.json()
-
     fun clear() {
         nReq = 0; nSp = 0; emitRows.clear(); strings.clear(); stringIndex.clear()
         opts.clear(); optsIndex.clear(); spawnedCount = 0; openRequest = -1; openRequestSpawnedAt = -1

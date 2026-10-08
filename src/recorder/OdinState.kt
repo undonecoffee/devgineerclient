@@ -73,7 +73,7 @@ object OdinState {
 
     fun install() {
         on<TickEvent.End> { if (Rec.active) DevgineerClient.safely("recorder odin state") { tick() } }
-        on<LevelEvent.Load> { deaths.clear(); lastDead.clear(); lastRooms.clear(); termOpen = false; entityParts.clear() }
+        on<LevelEvent.Load> { deaths.clear(); lastDead.clear(); lastRooms.clear(); termOpen = false; entityParts.clear(); RoomKeys.reset() }
 
         // Right after Odin's own (priority 0) parse of the tab list, on the network thread.
         onReceive<ClientboundPlayerInfoUpdatePacket>(priority = -1000) { if (Rec.active) DevgineerClient.safely("recorder odin net") { netSnapshot("player_info") } }

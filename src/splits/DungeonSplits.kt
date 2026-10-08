@@ -250,8 +250,8 @@ object DungeonSplits : Module(
         on<TickEvent.End> {
             if (!DungeonUtils.inDungeons) return@on
             DevgineerClient.safely("split bests") { recordSplitBests() }
-            if (barriers.size >= DoorBlocks.DOOR_BLOCKS) door(barriers, "start") { at, a, b -> blood.onDoorStart(at, a, b) }
-            if (cleared.size >= DoorBlocks.DOOR_BLOCKS) door(cleared, "down") { at, a, b -> blood.onDoorDown(at, a, b) }
+            if (barriers.size >= DoorBlocks.DOOR_BLOCKS) door(barriers) { at, a, b -> blood.onDoorStart(at, a, b) }
+            if (cleared.size >= DoorBlocks.DOOR_BLOCKS) door(cleared) { at, a, b -> blood.onDoorDown(at, a, b) }
             barriers.clear(); cleared.clear()
             for (i in sectionDoor.indices) {
                 if (sectionDoor[i] >= SECTION_DOOR_BLOCKS) {
@@ -439,7 +439,7 @@ object DungeonSplits : Module(
      */
     private fun necronDead(at: Stamp, how: String) {
         necronCue.onDeath()
-        boss.extra(SplitTracker.NECRON, at, "§cdead", "$how - he no longer says \"All this, for nothing...\"")
+        boss.extra(SplitTracker.NECRON, at, "§cdead", how)
         if (DungeonUtils.floor?.name?.startsWith("M") == true) {
             subs.onNecronDeath(at)
         }
@@ -510,7 +510,7 @@ object DungeonSplits : Module(
             if (trusted) {
                 card.onEveryoneInCore(now(), "Goldor moved, someone out of sight")
                 subs.onEveryoneInCore(now(), "Goldor starting to move - someone was out of render distance, so the core box couldn't tell")
-                boss.extra(SplitTracker.GOLDOR, now(), "§5everyone in", "Goldor started moving (0-5 ticks after the last one in, in the recordings)")
+                boss.extra(SplitTracker.GOLDOR, now(), "§5everyone in", "Goldor started moving (usually 0-5 ticks after the last player is in)")
             }
             goldorMoved = true
         }
@@ -549,7 +549,7 @@ object DungeonSplits : Module(
     }
 
     /** Each door among [blocks] ([DoorBlocks]), handed to [sink] with the rooms either side of it. */
-    private fun door(blocks: List<Pair<Int, Int>>, phase: String, sink: (Stamp, BloodRunDetail.MapRoom?, BloodRunDetail.MapRoom?) -> Unit) {
+    private fun door(blocks: List<Pair<Int, Int>>, sink: (Stamp, BloodRunDetail.MapRoom?, BloodRunDetail.MapRoom?) -> Unit) {
         for (d in DoorBlocks.doors(blocks)) {
             val a = room(d.a.first, d.a.second); val b = room(d.b.first, d.b.second)
             sink(now(), a, b)

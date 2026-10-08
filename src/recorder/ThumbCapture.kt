@@ -182,7 +182,7 @@ object ThumbCapture {
         if (encoder?.isAlive == true) return
         synchronized(this) {
             if (encoder?.isAlive == true) return
-            encoder = Thread(::encodeLoop, "ec-recorder-thumbs").apply { isDaemon = true; priority = Thread.MIN_PRIORITY; start() }
+            encoder = Thread(::encodeLoop, "dc-recorder-thumbs").apply { isDaemon = true; priority = Thread.MIN_PRIORITY; start() }
         }
     }
 

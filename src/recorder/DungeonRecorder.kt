@@ -94,13 +94,10 @@ object DungeonRecorder : Module(
         DevgineerClient.safely("recorder folder") { java.nio.file.Files.createDirectories(dir); net.minecraft.util.Util.getPlatform().openPath(dir) }
     }
 
-    internal val dir get() = DevgineerClient.mc.gameDirectory.toPath().resolve("devgineerclient-recordings")
+    /** The recordings folder's name, under the game directory. */
+    private const val FOLDER = "devgineerclient-recordings"
+    internal val dir get() = DevgineerClient.mc.gameDirectory.toPath().resolve(FOLDER)
 
-    /**
-     * Packet types never written as lines. Empty: keep-alives, pongs and chunk batches carry timing,
-     * and bundles have their own `bundle` line. Kept as the place for a user filter.
-     */
-    private val SKIP = emptySet<String>()
     private val MOVEMENT = setOf("minecraft:move_entity_pos", "minecraft:move_entity_pos_rot", "minecraft:move_entity_rot", "minecraft:rotate_head",
         "minecraft:set_entity_motion", "minecraft:entity_position_sync", "minecraft:teleport_entity")
     private val EFFECTS = setOf("minecraft:level_particles", "minecraft:sound", "minecraft:sound_entity")
@@ -135,9 +132,9 @@ object DungeonRecorder : Module(
         // A recording the game did not get to close (a crash) is cut back to its last whole member
         // and renamed; off the game thread, it only touches files.
         Thread({ DevgineerClient.safely("recorder recovery") {
-            RecorderFiles.recover(net.fabricmc.loader.api.FabricLoader.getInstance().gameDir.resolve("devgineerclient-recordings"))
+            RecorderFiles.recover(net.fabricmc.loader.api.FabricLoader.getInstance().gameDir.resolve(FOLDER))
                 .forEach { DevgineerClient.logger.info("[dc] recorder: $it") }
-        } }, "ec-recorder-recover").start()
+        } }, "dc-recorder-recover").start()
         // End the world first (an `end` line; a recording never confirmed is deleted, not kept), then
         // wait for the files of every session still writing.
         ClientLifecycleEvents.CLIENT_STOPPING.register {
@@ -161,7 +158,6 @@ object DungeonRecorder : Module(
                 // Odin's hook is on every Connection: the integrated server's sends are clientbound.
                 if (runCatching { p.type().flow() }.getOrNull() == PacketFlow.CLIENTBOUND) return@safely
                 val type = PacketJson.type(p)
-                if (type in SKIP) return@safely
                 packetLine("out", type, p, outBody(p), ",\"ph\":\"${WireTap.phase()}\",\"cancelled\":${ev.isCancelled}")
             }
         }
@@ -229,7 +225,6 @@ object DungeonRecorder : Module(
         // Before any filter: the mirror must see every entity packet to keep its bases right.
         val abs = try { EntityMirror.annotate(p) } catch (t: Throwable) { "\"absErr\":${q(t.toString())}" }
         val type = PacketJson.type(p)
-        if (type in SKIP) return
         if ((type in MOVEMENT && !movement) || (type in EFFECTS && !effects)) return
         ChunkCapture.observe(p)
         val body: () -> String = when {
@@ -307,8 +302,9 @@ object DungeonRecorder : Module(
         if (!inbound) off += "in"
         if (!outbound) off += "out"
         if (!movement) off += MOVEMENT
-        if (!effects) off += EFFECTS
-        return "{\"skip\":${SKIP.joinToString(",", "[", "]") { q(it) }},\"off\":${off.joinToString(",", "[", "]") { q(it) }}," +
+        // "skip" (per-type filter) stays in the format for readers but is always empty; groups go in "off".
+        // "skip" stays in the format (always empty: no packet type is ever left out of the lines).
+        return "{\"skip\":[],\"off\":${off.joinToString(",", "[", "]") { q(it) }}," +
             "\"chunkData\":$chunks,\"raw\":$rawPackets,\"typedChat\":$typedChat,\"hidePrivate\":$hidePrivate}"
     }
 

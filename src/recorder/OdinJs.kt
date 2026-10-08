@@ -25,7 +25,6 @@ internal class OdinJs(cap: Int = 256) {
     fun s(name: String, v: String?): OdinJs { key(name); str(sb, v); return this }
     fun n(name: String, v: Number?): OdinJs { key(name); num(sb, v); return this }
     fun b(name: String, v: Boolean?): OdinJs { key(name); sb.append(v?.toString() ?: "null"); return this }
-    fun raw(name: String, json: String?): OdinJs { key(name); sb.append(json ?: "null"); return this }
 
     /** A nested object. */
     fun obj(name: String, fill: OdinJs.() -> Unit): OdinJs {
@@ -69,7 +68,5 @@ internal class OdinJs(cap: Int = 256) {
             v.forEachIndexed { i, x -> if (i > 0) sb.append(','); num(sb, x) }
             sb.append(']')
         }
-
-        fun strings(sb: StringBuilder, items: Iterable<String?>) = array(sb, items) { o, s -> str(o, s) }
     }
 }
