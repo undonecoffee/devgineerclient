@@ -158,7 +158,7 @@ object RecorderFiles {
 
     /**
      * Deletes the oldest finished recordings under [root] until [bytesToFree] are gone. Only ever
-     * a directory [isFinishedRecording] accepts (never a folder of the user's, a pending one or one
+     * a directory [isFinishedRecording] accepts (never an unrelated folder, a pending one or one
      * in [keep], the sessions still writing). Returns bytes freed.
      */
     fun deleteOldest(root: Path, keep: Set<Path>, bytesToFree: Long): Long {

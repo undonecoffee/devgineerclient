@@ -40,7 +40,7 @@ import org.lwjgl.glfw.GLFW
  *    connection's lifecycle ([WireTap], [RecorderLifecycle]) and what became of each packet ([PacketFate]);
  *  - the world as the client held it ([ChunkCapture], [WorldCapture]) and every entity every tick
  *    ([EntityMirror], [EntityCapture]);
- *  - you: input and what it came to ([InputCapture]), your full state, the camera and the clock
+ *  - the player: input and what it came to ([InputCapture]), the full player state, the camera and the clock
  *    ([PlayerState], [FrameCapture], [EnvOptions]), screens, chat and HUD as drawn ([ScreenCapture],
  *    [HudCapture]), sounds and particles ([EffectsCapture]), opt-in thumbnails ([ThumbCapture]);
  *  - what the mods made of it: Odin's state, events and internals ([OdinState], [OdinEvents],
@@ -49,8 +49,7 @@ import org.lwjgl.glfw.GLFW
  * This object holds the settings and the packet path; each capture unit installs its own hooks and
  * does nothing while no recording is open. Files: <game dir>/devgineerclient-recordings/, one
  * directory per recording: gzipped JSON Lines parts with an index, a raw packet sidecar and a
- * manifest ([RecorderSession], [Rec]; format: docs/dungeon-recorder.md; tools/recorder/read.py
- * turns them into timelines, rebuilt states and LLM context packs).
+ * manifest ([RecorderSession], [Rec]).
  */
 object DungeonRecorder : Module(
     name = "Dungeon Recorder",

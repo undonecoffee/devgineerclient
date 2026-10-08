@@ -40,7 +40,7 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
 
 /**
- * Dungeon Recorder: what you did with your hands, and what came of it.
+ * Dungeon Recorder: the player's raw input, and what came of it.
  *
  * Packets only show what reached the server. This keeps the step before: every key, mouse button,
  * scroll, cursor move and look turn (with its time inside the tick, since GLFW is polled once a
@@ -93,7 +93,7 @@ object InputCapture {
 
         // Inside screens: Fabric's per-screen events, re-registered on every init (Fabric gives a
         // screen fresh event objects each time it is initialised). The mouse ones return a boolean
-        // that feeds the next listener: always hand back the flag we were given.
+        // that feeds the next listener: always return the flag that was passed in.
         ScreenEvents.AFTER_INIT.register { _, screen, _, _ ->
             ScreenKeyboardEvents.afterKeyPress(screen).register { s, k -> screenKey("screen.afterKeyPress", s, k) }
             ScreenKeyboardEvents.afterKeyRelease(screen).register { s, k -> screenKey("screen.afterKeyRelease", s, k) }
@@ -116,7 +116,7 @@ object InputCapture {
 
     init {
         // Odin's bus, last in line (Int.MIN_VALUE) and with cancelled events delivered, so the
-        // cancelled flag is the final word of every module before us.
+        // cancelled flag is the final word of every module before this one.
         on<InputEvent>(priority = Int.MIN_VALUE) {
             if (!on()) return@on
             DevgineerClient.safely("recorder bind") {
@@ -290,7 +290,7 @@ object InputCapture {
     }
 
     /**
-     * `,"mine":{pos,stage,progress}` while you are breaking a block, else "" (for the `me` line).
+     * `,"mine":{pos,stage,progress}` while the player is breaking a block, else "" (for the `me` line).
      * Game thread.
      */
     fun mineMembers(): String {
@@ -385,8 +385,11 @@ object InputCapture {
     private inline fun maps(match: (net.minecraft.client.KeyMapping) -> Boolean): String =
         mc.options.keyMappings.filter { runCatching { match(it) }.getOrDefault(false) }.joinToString(",", "[", "]") { q(it.name) }
 
-    /** Keys that would spell out what you type: a chat, sign or book screen, or any focused text field. */
-    /** A screen you type text into (chat, sign, book, a focused text field), when Typed Chat is off. Also used by [ThumbCapture]. */
+    /**
+     * Whether keys on [screen] would spell out typed text (chat, sign, book, a focused text field) and
+     * must be redacted: always with Typed Chat off, and for a private message even with it on. Also
+     * used by [ThumbCapture].
+     */
     internal fun redactKeys(screen: Screen?): Boolean {
         if (screen == null) return false
         val typing = screen is ChatScreen || screen is AbstractSignEditScreen || screen is BookEditScreen || screen is BookSignScreen ||

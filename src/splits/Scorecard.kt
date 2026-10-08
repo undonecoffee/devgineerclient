@@ -19,7 +19,7 @@ class Scorecard {
 
     // Blood, the way Devonian splits it: the dialog (his first line to "Let's see how you can handle
     // this."), the move (that line to the Watcher's first move at least 45 server ticks after it -
-    // 55-148 ticks in the recorded runs, depending on the camp), then the clear.
+    // roughly 55-150 ticks, depending on the camp), then the clear.
     /** "Let's see how you can handle this." */
     var watcherHandle: Stamp? = null
         private set
@@ -29,9 +29,8 @@ class Scorecard {
     private var portalOpen: Stamp? = null
 
     // Maxor: every "Energy Crystals are now active!" line (two a round), each stun, and his wither
-    // being removed — the kill. Before Hypixel's boss update (5 Oct 2026) that was 21-23 ticks
-    // before Storm speaks; since, it goes 54 after the kill and so only 1-18 before Storm speaks
-    // (Storm 62 after the kill), and most runs see it go only after him.
+    // being removed — the kill. Since Hypixel's boss update (Oct 2026) it goes 54 ticks after the
+    // kill, only 1-18 before Storm speaks (62 after the kill), so it is usually seen only after him.
     private val crystals = mutableListOf<Stamp>()
     private val maxorStuns = mutableListOf<Stamp>()
     private var maxorGone: Stamp? = null
@@ -44,14 +43,14 @@ class Scorecard {
     private var stormDead: Stamp? = null
 
     // Goldor: everyone in the core, the first hit on him, his death ("...." — the "Necron, forgive
-    // me." that follows 50-54 ticks later since the update, 81-83 before, is the end of his death
+    // me." that follows 50-54 ticks later since the boss update is the end of his death
     // animation).
     private var allIn: Stamp? = null
     private var goldorHit: Stamp? = null
     private var goldorDead: Stamp? = null
 
-    // Necron: leaving mid once his opening animation is over (81-84 ticks in since the update,
-    // 159-164 before), and first back on it after the first DPS knocks him off.
+    // Necron: leaving mid once his opening animation is over (81-84 ticks in since the boss update),
+    // and first back on it after the first DPS knocks him off.
     private var necronFree: Stamp? = null
     private var necronMid: Stamp? = null
 
@@ -231,8 +230,10 @@ class Scorecard {
         val MAXOR_STUNNED = setOf("[BOSS] Maxor: THAT BEAM! IT HURTS! IT HURTS!!", "[BOSS] Maxor: YOU TRICKED ME!")
         val LIGHTNING = setOf("[BOSS] Storm: ENERGY HEED MY CALL!", "[BOSS] Storm: THUNDER LET ME BE YOUR CATALYST!")
         val STORM_CRUSHED = setOf("[BOSS] Storm: Oof", "[BOSS] Storm: Ouch, that hurt!")
-        /** Said when he breaks free of a crush without dying — only sometimes; his moving is the rest. */
-        /** Storm breaking free of his pin. ("Slowing me down..." is one of his random taunts, not this.) */
+        /**
+         * Storm breaking free of a crush without dying: said only sometimes, his moving covers the
+         * rest. ("Slowing me down..." is one of his random taunts, not this.)
+         */
         val STORM_FREE = setOf("⚠ Storm is enraged! ⚠")
         const val STORM_DEAD = "[BOSS] Storm: I should have known that I stood no chance."
         const val GOLDOR_DEAD = "[BOSS] Goldor: ...."

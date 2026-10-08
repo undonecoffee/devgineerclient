@@ -19,7 +19,7 @@ import java.util.concurrent.Executors
 import java.util.zip.GZIPOutputStream
 
 /**
- * One world's boss recording (format: docs/boss-recorder.md). Nothing is written until the first
+ * One world's boss recording, gzipped JSON lines. Nothing is written until the first
  * time the recording is in focus - the Watcher's camp or the boss - so a world without a boss fight
  * leaves no file. From then on: the boss log, chat and your own movement, until the world unloads.
  *

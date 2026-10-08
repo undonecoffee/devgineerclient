@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Dungeon Recorder: mouse buttons, scrolls and cursor moves, as GLFW reports them (re-posted to the
- * game thread). Priority 1 so the scroll is seen before {@link WandScrollMixin} or anything else
+ * game thread). Priority 1 so the scroll is seen before Engineer Client's wand scroll or anything else
  * cancels it. Observe-only and optional (require = 0).
  */
 @Mixin(value = MouseHandler.class, priority = 1)

@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
  * Dungeon Recorder: where a spawned particle starts, how fast it moves and how long it lives. These
- * are protected fields on {@link Particle} (verified: x, y, z, xd, yd, zd, lifetime), read once
+ * are protected fields on {@link Particle} (x, y, z, xd, yd, zd, lifetime), read once
  * as the particle is added to the engine. Read-only.
  */
 @Mixin(Particle.class)

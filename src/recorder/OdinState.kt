@@ -32,7 +32,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
 
 /**
- * Odin's view of the dungeon, as the recorder's state lines (recorder-2 U11). Everything Odin
+ * Odin's view of the dungeon, as the recorder's state lines. Everything Odin
  * knows and the mods built on it read - the score inputs, the teammates and where the map puts
  * them, the room grid and each room's identity, doors, puzzles, the open terminal, the action-bar
  * stats, location and party, and which modules (Odin's and ours) are on with what settings - so a
@@ -53,7 +53,7 @@ import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
  */
 object OdinState {
 
-    /** `☠ Name ... and became a ghost.` - Odin 0.3.4 never counts deaths per player itself. */
+    /** `☠ Name ... and became a ghost.` - Odin does not count deaths per player from chat itself. */
     internal val GHOST = Regex("""☠ (\w{1,16}) .* and became a ghost\.""")
     private val COLOR = Regex("§.")
     /** StringSettings whose name says they may hold a secret: their value is never written. */
@@ -160,7 +160,7 @@ object OdinState {
         j.safe("inBoss") { it.append(DungeonListener.inBoss) }
         j.safe("inClear") { it.append(DungeonUtils.inClear) }
         j.safe("paul") { it.append(DungeonListener.paul) }
-        // Odin 0.3.6 dropped its Paul override setting (it goes by the mayor alone): kept as null.
+        // Odin 0.3.6+ has no Paul override setting (it goes by the mayor alone): written as null so the field stays.
         j.safe("togglePaul") { it.append("null") }
         j.safe("f7Phase") { OdinJs.str(it, DungeonUtils.getF7Phase().name) }
         // Replaced (not mutated) by Odin on every update: read it once, fresh.
@@ -240,7 +240,7 @@ object OdinState {
     }
 
     /**
-     * A map pixel coordinate to the world block coordinate it stands for (RunRecorder's formula):
+     * A map pixel coordinate to the world block coordinate it stands for:
      * the map's 128 px span is centred on 0, two pixels per map unit, [start] the grid's corner in
      * map units and [roomGap] one room plus its connector, in map units, for 32 blocks.
      */
@@ -348,7 +348,7 @@ object OdinState {
         return j.toString()
     }
 
-    // ------------------------------------------------------------------ where you are
+    // ------------------------------------------------------------------ player position
 
     /** The 6x6 room tile a block column is in (index x + 6z), or null outside the grid. */
     internal fun tileOf(bx: Int, bz: Int): Int? {
@@ -545,7 +545,7 @@ object OdinState {
 
     private val COLOR_CODES = Regex("§[0-9a-fk-orA-FK-OR]")
     private val TELEPORTED = Regex("^You have teleported to (\\w{1,16})!")
-    // "Party > [MVP++] m7kitten: Leaped to x!" - the rank bracket is absent for unranked players.
+    // "Party > [MVP++] Player: Leaped to x!" - the rank bracket is absent for unranked players.
     private val PARTY_LINE = Regex("^Party > (?:\\[[^]]*] )?(\\w{1,16}): (.*)$")
     private val LEAPED = Regex("^Leaped to (\\w{1,16})!")
 

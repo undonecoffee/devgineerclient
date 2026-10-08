@@ -34,7 +34,7 @@ data class RecConfig(
  */
 object Rec {
 
-    /** Client END_LEVEL_TICK count (absolute; moved here from DungeonRecorder). */
+    /** Client END_LEVEL_TICK count (absolute). */
     @Volatile var tick = 0
     /** Server ticks seen on the game connection (ping packets; absolute). */
     @Volatile var serverTicks = 0

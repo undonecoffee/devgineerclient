@@ -4,21 +4,19 @@ package com.devgineerclient.splits
  * When to hit Necron, as a line under his sub splits: the two hits that move his fight on, each
  * counted down, called while its window is open, and marked on time or late.
  *
- * His fight since Hypixel's boss update (5 Oct 2026), from 38 F7 and 5 M7 Better PF recordings
- * of it, n counting server ticks from his first line:
+ * His fight since Hypixel's boss update (Oct 2026), n counting server ticks from his first line:
  *
- *  1. 20% once his scripted sidestep is over: he leaves mid at 81-84 (159-164 before the update)
- *     and can't be hit for 7; hit, he is put back on mid (93-125 on F7, as late as 158 on M7).
- *  2. The kill, once the floor lifts: ARGH! is said at 269-273 in every run, however late he was
- *     back (so the slot is 265 on the 20-tick grid, n = 5 mod 20), and he dies on a later tick of
- *     the same grid - 365 at the earliest: the burst of TNT he dies in comes 4-12 after it
- *     (369-377 in 34 of 37 F7 runs), one tick late is 391, and a kill slow enough to see him leave
- *     mid again was 492.
+ *  1. 20% once his scripted sidestep is over: he leaves mid at 81-84 and can't be hit for 7;
+ *     hit, he is put back on mid (typically 93-125 on F7, as late as ~158 on M7).
+ *  2. The kill, once the floor lifts: ARGH! is said at 269-273 however late he was back (so the
+ *     slot is 265 on the 20-tick grid, n = 5 mod 20), and he dies on a later tick of the same
+ *     grid - 365 at the earliest: the burst of TNT he dies in comes 4-12 after it (usually
+ *     369-377); a kill one grid tick late bursts around 391, and a slower one sees him leave mid
+ *     again (around 492).
  *
- * The second ARGH!, the trip after "Let's make some space!" and "All this, for nothing..." that
- * the old fight had are gone, so his death is the burst ([onDeath]); the line still ends the cue
- * should it come. Every other hit does nothing for the time. Nothing here touches Minecraft; the
- * module feeds his position, the TNT and the clock in.
+ * His death is the TNT burst ([onDeath]); "All this, for nothing..." also ends the cue should it
+ * come. Every other hit does nothing for the time. Nothing here touches Minecraft; the module
+ * feeds his position, the TNT and the clock in.
  */
 class NecronHitCue {
 
@@ -34,7 +32,7 @@ class NecronHitCue {
     /** His first line: the fight's n = 0. */
     fun onStart(tick: Int) { reset(); start = tick }
 
-    /** His death (the TNT burst), or "All this, for nothing..." from before the update: the cue is done with. */
+    /** His death (the TNT burst, or "All this, for nothing..." should it come): the cue is done with. */
     fun onDeath() { if (start != null) ended = true }
 
     /** A chat line: his first starts the fight, his first ARGH! is the floor lifting. */
@@ -91,7 +89,7 @@ class NecronHitCue {
         if (left >= 0 && lost <= 0) "§6§lHIT NOW $what §7· §f" + SplitFormat.seconds(left * 50L) + " §7left"
         else "§c§lHIT NOW $what §7· §clate" + (if (lost > 0) " +" + SplitFormat.seconds(lost * 50L) else "")
 
-    /** Hit 1: on time if he was back by the latest seen still to make the first slot. */
+    /** Hit 1: on time if he was back by the latest tick known to still make the first slot. */
     private fun done(b1: Int) = if (b1 <= B1_DEADLINE) "§aHit 1 on time" else "§eHit 1 in, late"
 
     companion object {
@@ -102,7 +100,7 @@ class NecronHitCue {
         const val FIRST_SLOT = 265
         const val ARGH_DELAY = 8
         /**
-         * The latest he was back and still had ARGH! on 265: 158 (M7; F7's latest was 125). Later
+         * The latest he is known to be back and still have ARGH! on 265: ~158 (M7; ~125 on F7). Later
          * than that wasn't seen, so it is when hit 1 stops being called on time, not a known cost.
          */
         const val B1_DEADLINE = 158
@@ -113,7 +111,7 @@ class NecronHitCue {
             "[BOSS] Necron: You went further than any human before, congratulations.",
         )
         const val ARGH = "[BOSS] Necron: ARGH!"
-        /** His death line before the update: gone since, kept for old lines. */
+        /** His death line from before the boss update; still handled should it come. */
         const val END_LINE = "[BOSS] Necron: All this, for nothing..."
         const val OFF_MID = 0.5
         const val ON_MID = 0.05

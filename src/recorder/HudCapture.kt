@@ -247,11 +247,6 @@ object HudCapture {
         Rec.emit("tab", sb.toString())
     }
 
-    /**
-     * Every display slot that has an objective: its title and lines as drawn. The sidebar uses the
-     * same entries, order and 15-line cap the renderer does ([sidebarEntries]); the other slots list
-     * every score. A slot that loses its objective is written once with obj null.
-     */
     /** As `Gui.displayScoreboardSidebar` draws them: hidden holders dropped, highest score first, ties on the name, 15 lines. */
     private fun sidebarEntries(board: Scoreboard, obj: Objective): List<PlayerScoreEntry> =
         board.listPlayerScores(obj)
@@ -259,6 +254,11 @@ object HudCapture {
             .sortedWith(compareByDescending<PlayerScoreEntry> { it.value() }.thenBy(String.CASE_INSENSITIVE_ORDER) { it.owner() })
             .take(15)
 
+    /**
+     * Every display slot that has an objective: its title and lines as drawn. The sidebar uses the
+     * same entries, order and 15-line cap the renderer does ([sidebarEntries]); the other slots list
+     * every score. A slot that loses its objective is written once with obj null.
+     */
     private fun boards(full: Boolean) {
         val board = DevgineerClient.mc.level?.scoreboard ?: return
         if (full) boardKeys.clear()

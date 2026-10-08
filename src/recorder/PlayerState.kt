@@ -5,12 +5,12 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.item.ItemStack
 
 /**
- * Your own player, every tick, at full precision: the `me` line (position, last position, every
+ * The local player, every tick, at full precision: the `me` line (position, last position, every
  * rotation, motion, collisions, inputs, item use, swing, health, food, xp, abilities, camera, keys
  * held), `effects`, the inventory (`inv`, changed slots only) and item cooldowns (`cd`).
  *
  * The me line is written every tick and never deduplicated: an unchanged line is information too
- * (you stood still that tick), and doubles and floats keep their exact value, so a mod can be built
+ * (the player stood still that tick), and doubles and floats keep their exact value, so a mod can be built
  * against the very numbers the client had. The key map is the one exception: every key mapping's
  * state is a big, mostly constant object, so it rides along only when it changed (and in keyframes).
  *
@@ -97,7 +97,7 @@ object PlayerState {
         sb.append(",\"slot\":").append(p.inventory.selectedSlot)
         val keys = keys()
         if (Rec.changed("pl.keys", keys)) sb.append(",\"keys\":").append(keys)
-        // What you are breaking (U7: the destroy progress the client keeps).
+        // The block being broken and the destroy progress the client keeps.
         sb.append(InputCapture.mineMembers())
         Rec.emit("me", sb.toString())
     }

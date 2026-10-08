@@ -14,9 +14,9 @@ import net.minecraft.network.PacketListener
  *
  * It ends when the connection starts over (a reconfiguration or a new login), when the client
  * leaves the world it belongs to, when the game closes, or when the module is turned off. A respawn
- * (Hypixel's server switches) does not end it by itself: one recording follows you from the lobby
+ * (Hypixel's server switches) does not end it by itself: one recording follows the player from the lobby
  * into the run. But once a confirmed recording has respawned somewhere Odin says is not a place to
- * record (back to the hub or your island after the run), it ends there ("left"), and the next
+ * record (back to the hub or the private island after the run), it ends there ("left"), and the next
  * respawn into a wanted place starts a new one.
  *
  * Each session remembers the packet listener it belongs to, so the late "disconnected" event of the

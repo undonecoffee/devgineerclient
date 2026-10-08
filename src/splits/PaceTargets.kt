@@ -8,10 +8,10 @@ import com.odtheking.odin.utils.skyblock.floor7SplitGroup
 import java.util.Locale
 
 /**
- * What Sub Splits takes from Engineer Client's Odin Splits settings (its Pace target boxes, Color
+ * What the sub splits take from Engineer Client's Odin Splits settings (its Pace target boxes, Color
  * Based Off Time, Show PB), read by name off Odin's Splits module so this mod doesn't need Engineer
- * Client; without it, the boxes are blank (your PBs), colours are by time and bests aren't gold.
- * Engineer Client's OdinSplitsLook.paceTarget, minus the boxes' own settings.
+ * Client; without it, the boxes are blank (PBs are used), colours are by time and bests aren't gold.
+ * Mirrors Engineer Client's OdinSplitsLook.paceTarget, minus the boxes' own settings.
  */
 object PaceTargets {
     private val LABELS = listOf("Open", "Blood", "Portal", "Maxor", "Storm", "Terms", "Goldor", "Necron", "Dragons")
@@ -26,7 +26,7 @@ object PaceTargets {
 
     private fun bool(name: String, default: Boolean) = (Splits.settings[name] as? BooleanSetting)?.value ?: default
 
-    /** [label]'s (SplitTracker's) Pace target for SplitPace: its box, else your PB, else null (its dark green). */
+    /** [label]'s (SplitTracker's) Pace target for SplitPace: its box, else the PB, else null (its dark green). */
     fun paceTarget(label: String, master: Boolean): SplitPace.Clocks? {
         val i = SplitPace.ORDER.indexOf(label).takeIf { it >= 0 } ?: return null
         val box = LABELS.getOrNull(i)?.let { Splits.settings["${if (master) "M7" else "F7"} $it"] as? StringSetting }
@@ -34,7 +34,7 @@ object PaceTargets {
         return pb(i, master)
     }
 
-    /** Your PB for split [i]: the faster of the kept best and Odin's PB, each only if it is a real time. */
+    /** The PB for split [i]: the faster of the kept best and Odin's PB, each only if it is a real time. */
     private fun pb(i: Int, master: Boolean): SplitPace.Clocks? {
         val floor = if (master) "M7" else "F7"
         val id = SplitPace.ORDER.getOrNull(i)?.let { SplitPace.SPLIT_IDS[it] }

@@ -3,9 +3,8 @@ package com.devgineerclient.splits
 import java.util.Locale
 
 /**
- * The run's splits, copied from the team's own ChatTriggers module
- * (its EngineerSplits.js): the same eleven lines,
- * names, colours, order and format.
+ * The run's splits, in the Engineer Splits format: the same eleven lines, names, colours, order
+ * and format.
  *
  *     Pace       &3   everything so far
  *     Open       &a   run start -> the Watcher's first line (the blood rush)
@@ -16,13 +15,11 @@ import java.util.Locale
  *     Storm      &b   -> Goldor's first line
  *     Terms      &6   -> "The Core entrance is opening!"
  *     Goldor     &e   -> Necron's first line
- *     Necron     &c   -> EXTRA STATS. Since Hypixel's boss update of 5 Oct 2026 there is no end
- *                        animation to split off: he no longer says "All this, for nothing...", and
- *                        his death is straight into the run's end.
+ *     Necron     &c   -> EXTRA STATS. Since Hypixel's boss update (Oct 2026) there is no end
+ *                        animation to split off: his death goes straight into the run's end.
  *
- * Two things differ from the original, both on purpose. A split only appears once it has started,
- * rather than as a blank line. And Pace has no PB targets behind it — the original's
- * `/splits pace` numbers — so it is the run's running total.
+ * A split only appears once it has started, rather than as a blank line, and Pace here is the
+ * run's running total, with no PB targets behind it.
  *
  * Nothing here touches Minecraft, so it tests headlessly: feed it chat lines with the clock
  * readings they arrived at, then ask for the lines.
@@ -36,17 +33,17 @@ data class Split(val label: String, val start: Stamp, val stop: Stamp?)
 
 object SplitFormat {
 
-    /** Plain seconds to two places, the way the original's `.toFixed(2)` wrote every split. */
+    /** Plain seconds to two places, as every split is written. */
     fun seconds(ms: Long): String = String.format(Locale.ROOT, "%.2f", ms / 1000.0) + "s"
 
-    /** The original's `formatTime` for Pace and Enter: `3m 8.2s`. */
+    /** Minutes and seconds, for Pace and Enter: `3m 8.2s`. */
     fun minutes(ms: Long): String {
         val s = ms / 1000.0
         return "${(s / 60).toInt()}m " + String.format(Locale.ROOT, "%.1f", s % 60) + "s"
     }
 
     /**
-     * One line, exactly as the original wrote it:
+     * One split line:
      *
      *     ${colour}${name} &b> ${colour}${time}s &8(&7${serverTime}s&8)
      *
@@ -184,8 +181,7 @@ class SplitTracker {
 
         /**
          * What starts each phase. The Watcher's greeting varies, so any line of his opens Blood;
-         * the one-shot guard in [onChat] makes it the first. Every other line is the one the
-         * original listed, checked against the 32 recorded F7 runs.
+         * the one-shot guard in [onChat] makes it the first. Every other phase starts on one exact line.
          */
         private val PHASES = listOf(
             Phase(OPEN) { false },
@@ -195,8 +191,8 @@ class SplitTracker {
             Phase(STORM) { it == "[BOSS] Storm: Pathetic Maxor, just like expected." },
             Phase(TERMS) { it == "[BOSS] Goldor: Who dares trespass into my domain?" },
             Phase(GOLDOR) { it == "The Core entrance is opening!" },
-            // The original waited for "Finally, I heard so much about you.", which F7 never says;
-            // in every recording Necron's first line is this one.
+            // Not "Finally, I heard so much about you.", which F7 never says: on F7 Necron's first
+            // line is always this one.
             Phase(NECRON) { it == "[BOSS] Necron: You went further than any human before, congratulations." },
         )
     }

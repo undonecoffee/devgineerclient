@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
  * the game keeps per entity and moves with every add_entity, position sync and positioned move.
  * Reading the base from the entity itself is not possible here (the game thread applies the packet
  * later, and may already be ahead or behind), so this keeps its own copy, updated exactly the way
- * ClientPacketListener updates the entity's (checked against 26.1: teleport_entity leaves the base
+ * ClientPacketListener updates the entity's (checked against Minecraft 26.1: teleport_entity leaves the base
  * alone, so a relative teleport only says the absolute is pending; EntityCapture's emove line holds
  * where it landed).
  *
@@ -52,7 +52,7 @@ object EntityMirror {
     /** Queues [s] for the network thread; it only fills ids the mirror does not know yet. */
     fun seed(s: Seed) { seeds.add(s) }
 
-    /** Number of entities with a known base (tests, diagnostics). */
+    /** Number of entities with a known base (diagnostics). */
     internal val size: Int get() = codecs.size
 
     internal fun reset() {
@@ -123,7 +123,7 @@ object EntityMirror {
         return if (Relative.X in r || Relative.Y in r || Relative.Z in r) "\"absPending\":true" else abs(p.change().position())
     }
 
-    /** The current base of [id] (tests). */
+    /** The current base of [id]. */
     internal fun base(id: Int): Vec3? = codecs[id]?.base
 
     private fun drainSeeds() {

@@ -73,7 +73,7 @@ object WireTap {
     /** After a login or reconfiguration started and before the world's login packet: lines go to [cache]. */
     @Volatile private var betweenWorlds = false
 
-    /** The server kicked us (a disconnect packet arrived): the next disconnect is the server's. */
+    /** The server kicked the client (a disconnect packet arrived): the next disconnect is the server's. */
     @Volatile private var kicked = false
     /** An exception closed the connection: the next disconnect is an error's. */
     @Volatile private var errored = false
@@ -224,7 +224,7 @@ object WireTap {
     }
 
     /**
-     * `world`: the dimension the server put us in, from the login or respawn packet alone (the client
+     * `world`: the dimension the server put the player in, from the login or respawn packet alone (the client
      * has not built the level yet, so nothing is read from it).
      */
     private fun world(via: String, selfId: Int, spawn: CommonPlayerSpawnInfo, chunkRadius: Int?, simDist: Int?,
@@ -349,7 +349,7 @@ object WireTap {
         taken.dropped?.let { d -> Rec.emit("gap", d.json()) }
     }
 
-    /** Every serverbound packet that carries text you typed (unit-tested against every String-holding packet). */
+    /** Every serverbound packet that carries text the player typed (unit-tested against every String-holding packet). */
     val TYPED_TEXT_PACKETS: Set<Class<*>> = setOf(
         ServerboundChatPacket::class.java, ServerboundChatCommandPacket::class.java, ServerboundChatCommandSignedPacket::class.java,
         ServerboundCommandSuggestionPacket::class.java, ServerboundSignUpdatePacket::class.java, ServerboundRenameItemPacket::class.java,

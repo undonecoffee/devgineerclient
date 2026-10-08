@@ -79,7 +79,7 @@ internal object Reflect {
 }
 
 /**
- * Odin's internal working state, for an LLM building dungeon mods: what each puzzle solver has
+ * Odin's internal working state, for reference when building dungeon mods: what each puzzle solver has
  * worked out, the boss trackers (dragons, relics, Livid, the tick timers and terminal times), the
  * blood camp predictor, the P3 device helpers, Odin's splits, its map-sync websocket, the room
  * library and waypoints, the special-column guess, the end-of-run stats and Odin's own clocks.
@@ -164,7 +164,7 @@ object OdinInternals {
         // ---- P3 device helpers
         Probe("odin.p3", "ArrowAlign", BOSS + "ArrowAlign", fields(BOSS + "ArrowAlign", "recentClickTimestamps", "clicksRemaining", "currentFrameRotations", "targetSolution")),
         Probe("odin.p3", "ArrowsDevice", BOSS + "ArrowsDevice", fields(BOSS + "ArrowsDevice", "markedPositions", "targetPosition", "isDeviceComplete", "optimalAimPositions")),
-        // Odin 0.3.6 moved this state into TerminalsStatus (without inactiveList); still written as "InactiveWaypoints".
+        // Odin 0.3.6+ keeps this state in TerminalsStatus (which has no inactiveList); the line keeps the "InactiveWaypoints" name.
         Probe("odin.p3", "InactiveWaypoints", BOSS + "TerminalsStatus", fields(BOSS + "TerminalsStatus", "inactiveList", "section", "terminals", "levers", "device",
             "gate", "isComplete", "firstInSection", "lastCompleted")),
         Probe("odin.p3", "SimonSays", BOSS + "SimonSays", fields(BOSS + "SimonSays", "clickInOrder", "clickNeeded", "firstPhase", "startClickCounter", "lastLanternTick")),
@@ -331,8 +331,7 @@ object OdinInternals {
 
     /**
      * Odin's handler, with every message recorded first. It runs on the websocket's thread, so it
-     * only queues the (immutable) string; Odin's own handler is called outside the guard, exactly as
-     * before.
+     * only queues the (immutable) string; Odin's own handler is called outside the guard, unchanged.
      */
     private class SyncTap(val inner: Function1<String, Unit>?) : (String) -> Unit {
         override fun invoke(msg: String) {

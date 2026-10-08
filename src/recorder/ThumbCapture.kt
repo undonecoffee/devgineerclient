@@ -237,7 +237,7 @@ object ThumbCapture {
     }
 }
 
-/** The pure parts of [ThumbCapture]: sizes, scaling and encoding (unit tested). */
+/** The pure parts of [ThumbCapture]: sizes, scaling and encoding. */
 object ThumbMath {
 
     /** Thumbnails are a quarter of the screen each way. */

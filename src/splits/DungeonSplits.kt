@@ -42,7 +42,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties
  *  - Detailed: the same, vertical and labelled, `Move > 8.12s (8.00s)`.
  *  - Debug: Detailed plus every extra moment known about the section.
  *
- * [SplitTracker] times the splits, [SubSplitTracker] the 25 boss steps, [BloodRunDetail] the rush
+ * [SplitTracker] times the splits, [SubSplitTracker] the boss steps, [BloodRunDetail] the rush
  * room by room and [BossDetail] everything else; this module feeds them chat, the two clocks and
  * what it sees in the world, and draws the result.
  */
@@ -64,7 +64,6 @@ object DungeonSplits : Module(
     private var serverTicks = 0
     private fun now() = Stamp(System.currentTimeMillis(), serverTicks)
 
-    /** One sub-split HUD: its name, the split whose window it covers, and the colour of its name. */
     /** One sub-split HUD: its name, the split whose window it covers, the colour of its name, and its HUD's and detail's defaults. */
     private class Section(val name: String, val window: String, val colour: String, val x: Int, val y: Int, val scale: Float,
                           val level: BloodRunDetail.Level = BloodRunDetail.Level.COMPACT)
@@ -73,7 +72,7 @@ object DungeonSplits : Module(
         Section("Blood Rush", SplitTracker.OPEN, "§a", 780, 229, 0.9f),
         Section("Watcher", SplitTracker.BLOOD, "§c", 606, 249, 0.5f, BloodRunDetail.Level.DETAILED),
         Section("Portal", SplitTracker.PORTAL, "§d", 0, 13, 0.9f, BloodRunDetail.Level.DEBUG),
-        // The phase headers' colours from EngineerSubSplits.
+        // The phase headers' colours match Engineer Client's sub splits.
         Section("Maxor", SplitTracker.MAXOR, "§a", 0, 92, 1f, BloodRunDetail.Level.DEBUG),
         Section("Storm", SplitTracker.STORM, "§b", 546, 125, 0.9f, BloodRunDetail.Level.DEBUG),
         Section("Terminals", SplitTracker.TERMS, "§6", 754, 111, 0.5f),
@@ -81,8 +80,8 @@ object DungeonSplits : Module(
         Section("Necron", SplitTracker.NECRON, "§c", 337, 434, 1f),
     )
 
-    // The run's splits themselves are Odin's Splits now, in the Engineer Splits look
-    // (Engineer Client); [tracker] still times the phases the sub splits and scorecard hang off.
+    // The run's splits themselves are drawn by Odin's Splits (Engineer Client's Engineer Splits
+    // look); [tracker] times the phases the sub splits and scorecard hang off.
 
     private val scorecardHud by HUD("Scorecard Splits", "The whole run as a table: each split's total, then its sub splits.", true, 633, 110, 1f) { example ->
         if (example) return@HUD scorecard(this, listOf(
@@ -94,7 +93,7 @@ object DungeonSplits : Module(
         ))
         val now = now()
         val rows = card.rows(tracker.splits(), now, blood.roomTicks(), blood.over, subs.forSplit(SplitTracker.TERMS)) { scorecardCells(it, now) }
-        // Pace against your targets (F7: your PBs, else the dark green times), real time first; and the time lost to lag.
+        // Pace against the targets (F7: personal bests, else the dark green times), real time first; and the time lost to lag.
         val extra = if (rows.isEmpty()) emptyList() else listOfNotNull(
             pace(now)?.let { "§3Pace " + SplitPace.mss(it.ms) + " §8(" + SplitPace.mss(it.ticks * 50) + ")" },
             "§8Lag §7" + SplitFormat.seconds(SplitPace.lag(tracker.splits(), now)),
@@ -112,7 +111,7 @@ object DungeonSplits : Module(
         DevgineerClient.msg("§7Sub split bests cleared.")
     }
 
-    private val cardDebug by BooleanSetting("Scorecard Debug", false, desc = "Says in chat each moment the scorecard picks up, and what it read it from — for checking the new ones (portal, leaps, Goldor's first hit, Storm breaking free).")
+    private val cardDebug by BooleanSetting("Scorecard Debug", false, desc = "Says in chat each moment the scorecard picks up, and what it read it from (portal, leaps, Goldor's first hit, Storm breaking free).")
     private val card = Scorecard().also { c -> c.onEvent = { what -> if (cardDebug) DevgineerClient.msg("§8[scorecard] §7$what") } }
 
     /**
@@ -396,9 +395,8 @@ object DungeonSplits : Module(
     /**
      * Every living teammate inside the core — the main way everyone-in is found: true, false (a
      * teammate you can see is outside), or null when someone is out of render distance and
-     * everyone you can see is in, which the box can't decide. Your original box stopped at y 112,
-     * but the fight goes down to the core's floor (players stood at y 64-90 in the recorded runs),
-     * so it now reaches all the way down.
+     * everyone you can see is in, which the box can't decide. The box reaches all the way down to
+     * the core's floor, since the fight is fought as low as y 64-90.
      */
     private fun everyoneInCore(level: net.minecraft.client.multiplayer.ClientLevel): Boolean? {
         val alive = DungeonUtils.dungeonTeammates.filter { !it.isDead }
@@ -421,11 +419,10 @@ object DungeonSplits : Module(
 
     /**
      * A TNT appearing during Necron's fight. He dies in a burst of them, 3 or more within 2 server
-     * ticks (10 split 9 + 1 across two ticks at times), which since Hypixel's boss update (5 Oct
-     * 2026) is the clearest sign of his death: "All this, for nothing..." is never said. It came in
-     * 37 of 38 F7 recordings since (the other had no TNT at all) and all 5 M7, EXTRA STATS 38-50
-     * ticks after it on F7; the single TNT seen earlier in his fight (~236 and ~309 ticks in) never
-     * come 3 at a time.
+     * ticks (sometimes split 9 + 1 across two ticks). Since Hypixel's boss update (Oct 2026) this
+     * is the clearest sign of his death, as he no longer says "All this, for nothing..."; on F7
+     * EXTRA STATS follows 38-50 ticks later. The single TNT earlier in his fight (~236 and ~309
+     * ticks in) never come 3 at a time.
      */
     private fun onNecronTnt(at: Stamp) {
         necronTnt.addLast(at)
@@ -437,10 +434,8 @@ object DungeonSplits : Module(
     }
 
     /**
-     * Necron dead at [at]. On F7 that is all: his split runs on to the run's end, there being no
-     * end animation since the update. On M7 his fight is over and the Wither King's is next, so his
-     * steps end here, and Odin's own Necron split (which ended on "All this, for nothing...") is
-     * handed that line.
+     * Necron dead at [at]. On F7 that is all: his split runs on to the run's end, as the fight has
+     * no end animation. On M7 the Wither King's fight is next, so his steps end here.
      */
     private fun necronDead(at: Stamp, how: String) {
         necronCue.onDeath()
@@ -456,8 +451,8 @@ object DungeonSplits : Module(
     private val DEATH_BURST_TNT = 3
     private val DEATH_BURST_TICKS = 2
     /**
-     * His wither is removed 20-21 server ticks after the burst (24 of 24 F7 runs since the update
-     * where it was seen go). The one recording with no TNT at all still had it, 19 before the score.
+     * His wither is removed 20-21 server ticks after the burst, which makes it a backup for a
+     * missed burst.
      */
     private val NECRON_GONE = 20
 
@@ -501,8 +496,7 @@ object DungeonSplits : Module(
     /**
      * Everyone in the core, read off Goldor — the backup to the player box, used only when [trusted]
      * (someone is out of render distance, so the box can't tell). Once the core opens he holds still
-     * until the last player is in, then starts for the core: within 0-5 ticks of it in every
-     * recorded run. Only his first move counts. A jump of blocks at once is him coming into view,
+     * until the last player is in, then starts for the core within 0-5 ticks of it. Only his first move counts. A jump of blocks at once is him coming into view,
      * not moving, and starts the watch again.
      */
     private fun watchGoldor(level: net.minecraft.client.multiplayer.ClientLevel, trusted: Boolean) {
@@ -527,7 +521,7 @@ object DungeonSplits : Module(
 
     /**
      * Necron off mid and back: he stays on mid through his opening animation, leaves it when the
-     * fight starts (81-84 ticks in since Hypixel's boss update, 159-164 before), and the first DPS
+     * fight starts (81-84 ticks in since Hypixel's boss update), and the first DPS
      * ends when he is back on it.
      */
     private fun watchNecron(level: net.minecraft.client.multiplayer.ClientLevel) {
@@ -554,10 +548,6 @@ object DungeonSplits : Module(
         return mc.level?.players()?.filter { it.name.string in team }?.minByOrNull { it.distanceToSqr(x, y, z) }?.name?.string
     }
 
-    /**
-     * A door's blocks, handed to [sink] with the two rooms either side of it. A door sits halfway
-     * between two map tiles, which are 32 blocks apart with the grid's first at -185.
-     */
     /** Each door among [blocks] ([DoorBlocks]), handed to [sink] with the rooms either side of it. */
     private fun door(blocks: List<Pair<Int, Int>>, phase: String, sink: (Stamp, BloodRunDetail.MapRoom?, BloodRunDetail.MapRoom?) -> Unit) {
         for (d in DoorBlocks.doors(blocks)) {
@@ -601,7 +591,7 @@ object DungeonSplits : Module(
     /**
      * Maxor's wither, every tick of his split. He stands still through his intro and starts moving
      * 46 ticks after "DON'T DISAPPOINT ME" - that ends Move. A laser line freezes him 4 ticks later
-     * and the enrage line gets him moving again 1-3 ticks later (every recorded run); the chat lines
+     * and the enrage line gets him moving again 1-3 ticks later; the chat lines
      * are the moments themselves, so these only confirm them, in Debug.
      */
     private fun watchMaxor(level: net.minecraft.client.multiplayer.ClientLevel) {
@@ -628,8 +618,8 @@ object DungeonSplits : Module(
     /**
      * The Watcher's move, the way Devonian times it: once his dialog is over ("Let's see how you
      * can handle this."), the first tick he moves at least 45 server ticks after that line - the
-     * wait skips his settling right as he says it. 55-148 ticks after the line in the recorded runs,
-     * depending on the camp, so there is nothing to count it from: without him in view it stays
+     * wait skips his settling right as he says it. It comes anywhere from ~55 to ~150 ticks after
+     * the line, depending on the camp, so there is nothing to count it from: without him in view it stays
      * blank, and Debug says so. He is the zombie in one of his skins (Odin's Blood Camp list).
      */
     private fun watchWatcher(level: net.minecraft.client.multiplayer.ClientLevel) {
@@ -721,8 +711,8 @@ object DungeonSplits : Module(
     }
 
     /**
-     * [window]'s boss steps, each graded on its own clock (SubSplitGrades): bands from the recorded
-     * F7 runs, gold for a best, gray for a step that never varies. A new best is saved here. In Debug
+     * [window]'s boss steps, each graded on its own clock (SubSplitGrades): bands from typical
+     * F7 times, gold for a best, gray for a step that never varies. A new best is saved here. In Debug
      * each step says how it ended: the line, timed wait or check that started the next.
      */
     private fun gradedSteps(window: String, split: Split, now: Stamp): List<Row> {
@@ -788,7 +778,7 @@ object DungeonSplits : Module(
     }
 
     /**
-     * The run's pace ([SplitPace]) against your Pace targets - each split's box, else your PB, else
+     * The run's pace ([SplitPace]) against the Pace targets - each split's box, else the PB, else
      * its dark green - on F7 once the run has started; null otherwise (no dark green times off F7).
      */
     fun pace(now: Stamp = now()): SplitPace.Clocks? {
@@ -809,7 +799,7 @@ object DungeonSplits : Module(
      */
     private fun recordSplitBests() {
         val floor = DungeonUtils.floor?.name?.takeIf { it == "F7" || it == "M7" } ?: return
-        // Not in P3 Sim (a singleplayer world): the phases before its start are your targets, not times.
+        // Not in P3 Sim (a singleplayer world): the phases before its start are filled from targets, not real times.
         if (DevgineerClient.mc.hasSingleplayerServer()) return
         val splits = tracker.splits()
         splits.forEachIndexed { i, split ->
@@ -837,7 +827,7 @@ object DungeonSplits : Module(
         if (value < (validBest(id, bests[id]) ?: Long.MAX_VALUE)) { bests[id] = value; saveBests(floor, bests) }
     }
 
-    /** A kept best, unless it is under its step's floor (kept before the floor was raised): then none. */
+    /** A kept best, unless it is under its step's floor (e.g. saved before the floor was raised): then none. */
     private fun validBest(id: String, best: Long?): Long? = best?.takeIf { SubSplitGrades.canBeBest(id, it) }
 
     /** Engineer Client's store of [floor]'s bests (its Sub Splits module), when it is installed. */

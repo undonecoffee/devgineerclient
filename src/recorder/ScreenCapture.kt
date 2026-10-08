@@ -17,7 +17,7 @@ import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.item.ItemStack
 
 /**
- * Screens as you saw and used them, for the Dungeon Recorder. The packets say what the server put
+ * Screens as the player saw and used them, for the Dungeon Recorder. The packets say what the server put
  * in a container; this says what was on screen: which screen opened and how it was laid out (every
  * slot's position, so a reader can redraw it), each slot's item whenever it changes (the client's
  * prediction included, which the packets never show), the item on the cursor, the slot under the

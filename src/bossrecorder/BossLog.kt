@@ -44,13 +44,13 @@ import java.util.UUID
 
 /**
  * The Boss Recorder's packet log: the server's own packets about the boss fights, each stamped with
- * the server tick it arrived on, as `net` entries (format: docs/boss-recorder.md).
+ * the server tick it arrived on, as `net` entries.
  *
- * Better PF records the client's view once a client tick: mobs slid over 3 ticks toward where the
- * server put them, chat and blocks a tick late, other players only as they are drawn. That found
- * the fights' scripts but not what docs/mechanics/ left open - bosses' health and who hit them, a
- * boss skipping one move, who he targets and how soon he switches, projectiles' aim, exact spawn
- * and death ticks. Those need the packets themselves, which this keeps:
+ * A recording of the client's view (once a client tick) shows mobs slid over 3 ticks toward where
+ * the server put them, chat and blocks a tick late, and other players only as they are drawn. That
+ * is enough for the fights' scripts but not for bosses' health and who hit them, a boss skipping
+ * one move, who he targets and how soon he switches, projectiles' aim, or exact spawn and death
+ * ticks. Those need the packets themselves, which this keeps:
  *
  *  - always: every boss wither's movement, head, spawn, removal, health data and damage, the boss
  *    bar, and the server's clock (`time`, its game time every second);

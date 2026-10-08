@@ -26,7 +26,7 @@ import com.odtheking.odin.utils.skyblock.dungeon.terminals.terminalhandler.Termi
 import net.minecraft.core.registries.BuiltInRegistries
 
 /**
- * Odin's own event stream as `ev` lines (recorder-2 U11): `{"k":"ev","e":Name,"thr":"main|net",
+ * Odin's own event stream as `ev` lines: `{"k":"ev","e":Name,"thr":"main|net",
  * "cancelled"?,...}`. These are the moments Odin's features act on - a room entered, a secret
  * picked up, a terminal opened or clicked, the score changing - so a recording shows exactly when
  * Odin saw each one, not just the packets it came from.
@@ -151,7 +151,7 @@ object OdinEvents {
         j.arr("solution", t.solution.toList()) { out, x -> OdinJs.num(out, x) }
     }
 
-    /** What you sent: the text only with Typed Chat on; otherwise a command's root word, or a chat line's length. */
+    /** A sent chat line or command: the text only with Typed Chat on; otherwise a command's root word, or a chat line's length. */
     internal fun sent(j: OdinJs, text: String) {
         when {
             Rec.typedAllowed(text, text.startsWith("/")) -> j.s("text", text)
